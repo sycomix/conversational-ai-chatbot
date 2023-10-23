@@ -68,10 +68,9 @@ def read_wave_to_buffer(wavefile):
             assert sample_width == 2, "Only 16-bit WAV PCM supported"
             assert compression_type == "NONE", "Only linear PCM WAV files supported"
             assert channel_num == 1, "Only mono WAV PCM supported"
-            audio = np.frombuffer(
+            return np.frombuffer(
                 wave_read.readframes(pcm_length * channel_num), dtype=np.int16
             ).reshape((pcm_length, channel_num))
-            return audio
         except:
             if wave_read.closed == False:
                 wave_read.close()
@@ -89,7 +88,7 @@ def main():
     buf = read_wave_to_buffer(wavefile)
     ts.push_data(buf)
     res = ts.get_result(True, True)
-    print("{}".format(res))
+    print(f"{res}")
     ts.close()
 
 

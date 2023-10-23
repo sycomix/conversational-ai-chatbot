@@ -107,7 +107,7 @@ class Alphabet(object):
         with codecs.open(alphabet_cfg, "r", "utf-8") as fin:
             try:
                 for line in fin:
-                    if line[0:2] == "\\#":
+                    if line[:2] == "\\#":
                         line = "#\n"
                     elif line[0] == "#":
                         continue
@@ -117,7 +117,7 @@ class Alphabet(object):
             except Exception as msg:
                 if fin.closed == False:
                     fin.close()
-                log.error("Received Exception: {}".format(msg))
+                log.error(f"Received Exception: {msg}")
 
 
     def string_from_label(self, label):

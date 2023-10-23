@@ -22,7 +22,7 @@ def pusher(manager, port):
     data = ""
     while not Final:
         data, Final = manager.get_result()
-        log.info("Inferred Output: ' {} ' Final: ' {} '".format(data.decode(), Final))
+        log.info(f"Inferred Output: ' {data.decode()} ' Final: ' {Final} '")
     log.debug("Publishing text output to 0MQ")
     port.push(bytes(pretty(data), encoding="utf-8"), "FINAL")
 
@@ -53,10 +53,10 @@ def main():
         # Blocking Call
         for data, event in ipp.data_and_event_generator():
             log.debug(
-                "Data with Length: {} is received along with event: {}".format(len(data), event)
+                f"Data with Length: {len(data)} is received along with event: {event}"
             )
             if event == "pcm":
-                log.debug("Process data received with event: {}".format(event))
+                log.debug(f"Process data received with event: {event}")
                 process_pcm_data(data, manager, Outport)
 
     except Exception as msg:

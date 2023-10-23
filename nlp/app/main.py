@@ -102,12 +102,12 @@ def send_message(message):
     log.debug("Preparing Header")
     headers = {
         "content-type": "application/json",
-        "Authorization": "Bearer {}".format(jwt_token),
+        "Authorization": f"Bearer {jwt_token}",
     }
     log.debug("Sending POST Request")
 
     r = requests.post(
-        config.SERVER_URL + "/webhooks/rest/webhook",
+        f"{config.SERVER_URL}/webhooks/rest/webhook",
         headers=headers,
         data=json.dumps(payload),
         verify=config.get_cacert(),
@@ -144,9 +144,9 @@ def main():
             if event == "FINAL":
                 log.debug("Decode Input bytes to utf-8")
                 text = data.decode()
-                log.info("User: {}".format(text))
+                log.info(f"User: {text}")
                 reply = send_message(text)
-                log.info("Bot: {}".format(pretty_with_mask(reply)))
+                log.info(f"Bot: {pretty_with_mask(reply)}")
                 # log.info ("send to tts: {}".format(format_bot_reply_for_tts(reply)))
                 # Send output to the port
                 formatted_reply = format_bot_reply_for_tts(reply)

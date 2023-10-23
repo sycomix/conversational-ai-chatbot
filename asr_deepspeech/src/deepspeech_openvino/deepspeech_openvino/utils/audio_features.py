@@ -12,7 +12,7 @@ def samples_to_melspectrum(
     window_size, stride = round(window_size), round(stride)
 
     # window_size must be a power of 2 to match tf:
-    if not (window_size > 0 and (window_size - 1) & window_size == 0):
+    if window_size <= 0 or (window_size - 1) & window_size != 0:
         raise ValueError(
             "window_size(ms)*sampling_rate(kHz) must be a power of two")
 
@@ -41,8 +41,7 @@ def samples_to_melspectrum(
     freq_bin_fmin = round(fmin / sampling_rate * 2 * (window_size - 1))
     spec[: freq_bin_fmin + 1, :] = 0.0
 
-    melspectrum = np.dot(mel_basis, spec)
-    return melspectrum
+    return np.dot(mel_basis, spec)
 
 
 def melspectrum_to_mfcc(melspectrum, dct_coefficient_count):

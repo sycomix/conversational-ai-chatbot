@@ -84,8 +84,4 @@ def ctc_beam_search_decoder(input_tensor, text_label, blank, beamwidth):
 
     res = sorted(_pT["l"].items(), reverse=True, key=lambda item: item[1])[0]
 
-    text = ""
-    for idx, _r in enumerate(res[0]):
-        text += text_label[_r[0]]
-
-    return text
+    return "".join(text_label[_r[0]] for _r in res[0])

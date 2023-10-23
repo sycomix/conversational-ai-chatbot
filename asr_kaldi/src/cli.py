@@ -42,10 +42,8 @@ def buffer_generator(file):
     with wave.open(file, "rb") as f:
         try:
             frames_per_buffer = 160
-            frames = f.readframes(frames_per_buffer)
-            while frames:
+            while frames := f.readframes(frames_per_buffer):
                 yield frames
-                frames = f.readframes(frames_per_buffer)
         except:
             if f.closed == False:
                 f.close()

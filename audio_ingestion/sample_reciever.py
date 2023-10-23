@@ -29,7 +29,7 @@ def main():
     print("Started App")
     context = zmq.Context()
     socket = context.socket(zmq.SUB)
-    socket.connect("tcp://localhost:%s" % PORT)
+    socket.connect(f"tcp://localhost:{PORT}")
     print("Connected to Socket")
     topic = bytes("audio", encoding="utf-8")
     socket.setsockopt(zmq.SUBSCRIBE, topic)

@@ -50,7 +50,7 @@ def main():
     sm.initialize(config_file)
     end_time = time.time()
 
-    print("Speech manager initialized in {} secs".format(end_time - start_time))
+    print(f"Speech manager initialized in {end_time - start_time} secs")
 
     # output_file = args.out
 

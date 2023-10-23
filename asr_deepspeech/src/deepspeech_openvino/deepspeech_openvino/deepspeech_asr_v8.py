@@ -23,8 +23,7 @@ def preprocess_sound(audio_rev, stt):
     # normalize to -1 to 1, int 16 to float32
     audio = audio / np.float32(32768)
     audio = audio.reshape(-1, 1)
-    audio_features = stt.extract_mfcc(audio, sampling_rate=sampling_rate)
-    return audio_features
+    return stt.extract_mfcc(audio, sampling_rate=sampling_rate)
 
 
 def get_profile(profile_name):
@@ -82,19 +81,17 @@ class DeepSpeechv8(DeepSpeechASR):
         transcription = self.stt.decode_probs(character_probs)
         # print(transcription)
         for candidate in transcription:
-            self.text = "{} ".format(candidate["text"])
-            # print(self.text)
+            self.text = f'{candidate["text"]} '
+                # print(self.text)
         self.output_text = self.text
 
     def _transcribe(self, features):
         pass
 
     def get_result(self, final, finish_processing):
-        # TODO: do something with final
-        result = self.output_text
         if finish_processing:
             self.exec_net = ""
             import time
 
             # self.stt.activate_model(self.stt.default_device)
-        return result
+        return self.output_text

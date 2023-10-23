@@ -28,8 +28,6 @@ from threading import Thread
 def get_jwt():
     c = z.RPCClient(os.environ["TOKEN_SERVER_ADDR"], z.supported_cmds)
     return c.get_token()
-    
-    return c
 
 
 def logout(token):
@@ -125,11 +123,11 @@ class ActionDefaultFallback(Action):
         tracker: Tracker,
         domain: Dict[Text, Any],
     ) -> List[Dict[Text, Any]]:
-        log.debug("Action {} Started".format(self.name()))
+        log.debug(f"Action {self.name()} Started")
         dispatcher.utter_message(template="utter_default")
 
         # Revert user message which led to fallback.
-        log.debug("Action {} Completed".format(self.name()))
+        log.debug(f"Action {self.name()} Completed")
         return []
 
 
@@ -143,14 +141,14 @@ class ActionListBanks(Action):
         tracker: Tracker,
         domain: Dict[Text, Any],
     ) -> List[Dict[Text, Any]]:
-        log.debug("Action {} Started".format(self.name()))
-        
+        log.debug(f"Action {self.name()} Started")
+
         supported_bank = "Bank-of-Pune"
         # print ("Default bank_name ", tracker.get_slot('bank_name'))
         dispatcher.utter_message(
             template="utter_supported_banks", bank_name=proper_bank_name(supported_bank)
         )
-        log.debug("Action {} Completed".format(self.name()))
+        log.debug(f"Action {self.name()} Completed")
         return []
 
 
@@ -164,7 +162,7 @@ class ActionListAtms(Action):
         tracker: Tracker,
         domain: Dict[Text, Any],
     ) -> List[Dict[Text, Any]]:
-        log.debug("Action {} Started".format(self.name()))
+        log.debug(f"Action {self.name()} Started")
         # Get bank from tracker
         bank_name = tracker.get_slot("bank_name")
         supported_banks = ["Bank-of-Pune"]
@@ -173,7 +171,7 @@ class ActionListAtms(Action):
                 template="utter_supported_banks",
                 bank_name=",".join(list(map(proper_bank_name, supported_banks))),
             )
-            log.debug("Action {} Completed".format(self.name()))
+            log.debug(f"Action {self.name()} Completed")
             return []
         conn = backend_helper()
         atm_ = atm.ATM(conn)
@@ -184,14 +182,12 @@ class ActionListAtms(Action):
         # banknames = map(names, list_of_atms)
         # texti =  '\n'.join(list(banknames))
         try:
-            atm_response = "you will find one near {}".format(
-                list_of_atms[0]["address"]["line_1"]
-            )
+            atm_response = f'you will find one near {list_of_atms[0]["address"]["line_1"]}'
         except (KeyError, IndexError):
-            atm_response = "No atms found for {}".format(proper_bank_name(bank_name))
+            atm_response = f"No atms found for {proper_bank_name(bank_name)}"
 
         dispatcher.utter_message(text=atm_response)
-        log.debug("Action {} Completed".format(self.name()))
+        log.debug(f"Action {self.name()} Completed")
         return []
 
 def _get_account_details(atm_, bank_name, dispatcher):
@@ -233,14 +229,14 @@ class ActionListAccountsAtBank(Action):
         domain: Dict[Text, Any],
     ) -> List[Dict[Text, Any]]:
         # Get bank from tracker
-        log.debug("Action {} Started".format(self.name()))
+        log.debug(f"Action {self.name()} Started")
 
         conn = backend_helper()
         atm_ = accounts.Account(conn)
 
         try:
             bank_name = tracker.get_slot("bank_name")
-            log.debug("Bank name from tracker {}".format(bank_name))
+            log.debug(f"Bank name from tracker {bank_name}")
         except Exception:
             log.debug("Bank name not in tracker")
 
@@ -251,15 +247,15 @@ class ActionListAccountsAtBank(Action):
                 template="utter_supported_banks",
                 bank_name=",".join(list(map(proper_bank_name, supported_banks))),
             )
-            log.debug("Action {} Completed".format(self.name()))
+            log.debug(f"Action {self.name()} Completed")
             return []
 
         value, account_number = _get_account_details(atm_, bank_name, dispatcher)
         total_accounts = len(value.split(':'))
-        textp = "You have {} savings accounts with our bank".format(total_accounts)
+        textp = f"You have {total_accounts} savings accounts with our bank"
         dispatcher.utter_message(text=textp)
 
-        log.debug("Action {} Completed".format(self.name()))
+        log.debug(f"Action {self.name()} Completed")
         return [SlotSet(key="account_number", value=value)]
 
 
@@ -337,13 +333,13 @@ class ActionLogout(Action):
         tracker: Tracker,
         domain: Dict[Text, Any],
     ) -> List[Dict[Text, Any]]:
-        log.debug("Action {} Started".format(self.name()))
+        log.debug(f"Action {self.name()} Started")
         logout_async = Thread(target=logout, args=(get_jwt()), daemon=True)
         logout_async.start()
         # Clear slots from tracker
         dispatcher.utter_message(template="utter_goodbye")
 
-        log.debug("Action {} Completed".format(self.name()))
+        log.debug(f"Action {self.name()} Completed")
         return [
             SlotSet(key="account_number", value=None),
             SlotSet(key="bank_name", value=None),

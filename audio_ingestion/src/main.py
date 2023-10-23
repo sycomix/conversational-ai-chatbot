@@ -71,7 +71,7 @@ def main():
                 try:
                     publish_pcm(Outport, wfile)
                     audio_file = wfile.rsplit("/", 1)[1]
-                    log.debug("publishing {}".format(audio_file))
+                    log.debug(f"publishing {audio_file}")
                     time.sleep(30)
                 except Exception as msg:
                     log.error("Received Exception %s", msg)

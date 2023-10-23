@@ -23,7 +23,7 @@ def load_alphabet(filename):
                 if line[0] == "#":  # comment
                     continue
                 if line.startswith("\\s"):  # "\s" for space as the first character
-                    line = " " + line[2:]
+                    line = f" {line[2:]}"
                 elif (
                     line[0] == "\\"
                 ):  # escaping, to enter "#" or "\" as the first character
@@ -37,7 +37,7 @@ def load_alphabet(filename):
 
 
 def get_default_alphabet():
-    default_alphabet_characters = [
+    return [
         " ",
         "a",
         "b",
@@ -67,7 +67,6 @@ def get_default_alphabet():
         "z",
         "'",
     ]
-    return default_alphabet_characters
 
 
 class CtcdecoderAlphabet:

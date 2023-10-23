@@ -13,7 +13,6 @@ class Account(apiObject):
 
     def create_account(self):
         cmd = "put"
-        pass
 
     def create_account_post(self):
         pass
@@ -38,8 +37,7 @@ class Account(apiObject):
         response = self.request(cmd, endpoint)
         if response.ok:
             try:
-                js = response.json()
-                return js
+                return response.json()
             except Exception:
                 return {}
 
@@ -55,8 +53,7 @@ class Account(apiObject):
         response = self.request(cmd, endpoint)
         if response.ok:
             try:
-                js = response.json()["accounts"]
-                return js
+                return response.json()["accounts"]
             except Exception:
                 return []
 

@@ -14,12 +14,10 @@ SERVER_URL = "http://localhost:5005"
 
 
 def get_sanic_server_ssl(app):
-    # read sanic variables
-    ssl = {
+    return {
         "cert": os.path.join("/run/secrets", app.config.SERVERCERT),
         "key": os.path.join("/run/secrets", app.config.SERVERKEY),
     }
-    return ssl
 
 
 def get_client_cert(app):
@@ -98,6 +96,8 @@ def forward_to_rasa(app, req):
     headers = {"content-type": "application/json"}
     # r = requests.post(SERVER_URL + '/webhooks/rest/webhook', headers=headers, data = json.dumps(payload), verify=False,cert = get_client_cert(app) )
     r = requests.post(
-        SERVER_URL + "/webhooks/rest/webhook", headers=headers, data=json.dumps(payload)
+        f"{SERVER_URL}/webhooks/rest/webhook",
+        headers=headers,
+        data=json.dumps(payload),
     )
     return r.json()

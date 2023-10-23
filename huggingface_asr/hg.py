@@ -71,7 +71,7 @@ def main():
                 # take argmax and decode
                 predicted_ids = torch.argmax(logits, dim=-1)
                 transcription = processor.decode(predicted_ids[0])
-                log.debug("Audio Transcription: {}".format(transcription))
+                log.debug(f"Audio Transcription: {transcription}")
                 ds = ds.remove_columns("speech")
                 log.debug("Publishing text output to 0MQ")
                 ooutport.push(bytes(transcription.lower(), encoding="utf-8"), "FINAL")

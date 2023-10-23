@@ -59,7 +59,7 @@ class RPCClient(object):
             return scd["result"]
 
     def _command(self, cmd, args=""):
-        if not cmd in self._supported_cmds.keys():
+        if cmd not in self._supported_cmds.keys():
             raise ValueError
         scd = json.loads(self._supported_cmds[cmd])
         if scd["params"]:
@@ -69,12 +69,10 @@ class RPCClient(object):
         return self._parse_json_response(resp)
 
     def verify(self, session_id):
-        ret = self._command("verify", session_id)
-        return ret
+        return self._command("verify", session_id)
 
     def get_token(self):
-        token = self._command("get_token")
-        return token
+        return self._command("get_token")
 
     def logout(self, token):
         token = self._command("logout", token)
@@ -107,9 +105,9 @@ class RPCServer(object):
             raise ValueError
 
     def _json_response(self, id, data, error=False):
-        response_template = '{"jsonrpc": "2.0", "result": {} , "id": {} }'
         response_error_template = '{"jsonrpc": "2.0", "error": {} , "id": {} }'
         if not error:
+            response_template = '{"jsonrpc": "2.0", "result": {} , "id": {} }'
             k = json.loads(response_template)
             k["result"] = data
             k["id"] = id
@@ -124,8 +122,7 @@ class RPCServer(object):
         scd = json.loads(jsorrpc_request_str)
         try:
             cmd = scd["method"]
-            args = scd["params"]
-            if args:
+            if args := scd["params"]:
                 ret = self.handlers[cmd](args)
             else:
                 ret = self.handlers[cmd]()

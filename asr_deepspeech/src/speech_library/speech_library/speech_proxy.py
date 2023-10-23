@@ -62,9 +62,7 @@ class SpeechProxy:
         :param wave_data: Audio data to push (bytes)
         :return: True if result is stable, False otherwise
         """
-        if self._speech:
-            return self._speech.push_data(wave_data)
-        return False
+        return self._speech.push_data(wave_data) if self._speech else False
 
     def get_result(self, final=False, finish_processing=False):
         """Get result text from ASR
@@ -113,4 +111,4 @@ def speech_process(conn, logger_queue, asr_config, **kwargs):
             )
             conn.send((utt_text, is_stable or finish_processing))
         except Exception as msg:
-            print("speech_process: exception: %s" % msg)
+            print(f"speech_process: exception: {msg}")

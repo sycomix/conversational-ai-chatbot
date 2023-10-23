@@ -75,7 +75,7 @@ class ConversationalAIException(Exception):
     """
 
     def __init__(self, message):
-        print("[Error]: {}".format(message))
+        print(f"[Error]: {message}")
         sys.exit(-1)
 
 
@@ -120,7 +120,7 @@ class SetAudioDevice(object):
         self.cwd = os.getcwd()
         self.http_proxy = os.getenv("http_proxy", default="")
         self.https_proxy = os.getenv("https_proxy", default="")
-        self.socketDir = "{}/{}/{}".format(self.cwd, MODULE, SOCKET_DIR)
+        self.socketDir = f"{self.cwd}/{MODULE}/{SOCKET_DIR}"
 
     def set_logger(self, log_file):
         Logger = logging.getLogger()
@@ -195,7 +195,7 @@ class SetAudioDevice(object):
                 self.run_command(cmd, mandatory=False)
 
     def del_file(self, file):
-        cmds = ["sudo rm -rf {}".format(file)]
+        cmds = [f"sudo rm -rf {file}"]
         for cmd in cmds:
             with open(TMP_FILE, "w") as outp:
                 self.run_command(cmd, mandatory=False)
@@ -212,10 +212,7 @@ class SetAudioDevice(object):
         return list(map(lambda x: x[0], recorders))
 
     def get_recorder_number(self, recorders, name):
-        for r in recorders:
-            if name in r:
-                return r[1]
-        return None
+        return next((r[1] for r in recorders if name in r), None)
 
     def playback_devices(self):
         cmds = [
@@ -226,13 +223,9 @@ class SetAudioDevice(object):
         for cmd in cmds:
             with open(TMP_FILE, "w") as outp:
                 self.run_command(cmd)
-        f = open("soundcards.tmp", "r")
-        data = f.readlines()
-        f.close()
-        rds = []
-        for line in data:
-            if "card" in line:
-                rds.append(line.split(":")[1].split("[")[0])
+        with open("soundcards.tmp", "r") as f:
+            data = f.readlines()
+        rds = [line.split(":")[1].split("[")[0] for line in data if "card" in line]
         return list(map(lambda x: "".join(x.split()), set(rds)))
 
     def recording_devices(self):
@@ -244,20 +237,16 @@ class SetAudioDevice(object):
         for cmd in cmds:
             with open(TMP_FILE, "w") as outp:
                 self.run_command(cmd)
-        f = open("soundcards.tmp", "r")
-        data = f.readlines()
-        f.close()
-        rds = []
-        for line in data:
-            if "card" in line:
-                # self.log.info(line)
-                rds.append(
-                    (
-                        line.split(":")[1].split("[")[0],
-                        line.split(":")[0].replace("card", ""),
-                    )
-                )
-
+        with open("soundcards.tmp", "r") as f:
+            data = f.readlines()
+        rds = [
+            (
+                line.split(":")[1].split("[")[0],
+                line.split(":")[0].replace("card", ""),
+            )
+            for line in data
+            if "card" in line
+        ]
         return list(
             map(lambda x: ("".join(x[0].split()), "".join(x[1].split())), set(rds))
         )
@@ -294,9 +283,8 @@ class SetAudioDevice(object):
         for cmd in cmds:
             with open(TMP_FILE, "w") as outp:
                 self.run_command(cmd)
-        f = open("soundcards.tmp", "r")
-        data = f.readlines()
-        f.close()
+        with open("soundcards.tmp", "r") as f:
+            data = f.readlines()
         rds = []
         for line in data:
             if "no soundcards found" in line:
@@ -326,9 +314,7 @@ class SetAudioDevice(object):
             #     break
             if not rec_name:
 
-                print(
-                    "Recording devices: {}".format(self.get_recorders_name(recorders))
-                )
+                print(f"Recording devices: {self.get_recorders_name(recorders)}")
 
                 rec_name = input("Choose Recording Device (case sensitive): ")
                 if rec_name not in list(map(lambda x: x[0], recorders)):
@@ -340,7 +326,7 @@ class SetAudioDevice(object):
 
             print("")
             print("|====PLAYBACK=====================|")
-            print("Playback devices: {}".format(players))
+            print(f"Playback devices: {players}")
             play = input("Choose Playback Device (case sensitive): ")
             if play not in players:
                 print("[Warning]: Choose the correct playback device")
@@ -353,14 +339,13 @@ class SetAudioDevice(object):
             print("")
             output = input("Do you hear the audio? (y/n): ")
 
-            if output.lower() == "y":
-                print("Great! Let's move on.")
-                break
-            else:
+            if output.lower() != "y":
                 # message = "[ERROR]: Plug in another audio device and start the installation again."
                 # print(message)
                 return (None, None)
 
+            print("Great! Let's move on.")
+            break
         return (rec, play)
 
     def set_device(self):
@@ -466,16 +451,16 @@ class ConversationalAI(SetAudioDevice):
         os.environ["ASR_IMAGE"] = self.asr_image
         os.environ["INGESTION_TYPE"] = self.ingestion_type
 
-        self.log.info("TAG={}".format(self.tag))
-        self.log.info("ASR_IMAGE={}".format(self.asr_image))
-        self.log.info("INGESTION_TYPE={}".format(self.ingestion_type))
-        self.log.info("PIP_INDEX_URL={}".format(self.pip_index_url))
-        self.log.info("DEB_MIRROR_URL={}".format(self.deb_mirror_url))
-        self.log.info("APT_MIRROR_URL={}".format(self.apt_mirror_url))
-        self.log.info("ALSA_CARD={}".format(self.alsa_card))
-        self.log.info("ALSA_PCM_CARD={}".format(self.alsa_pcm_card))
-        self.log.info("http_proxy={}".format(self.http_proxy))
-        self.log.info("https_proxy={}".format(self.https_proxy))
+        self.log.info(f"TAG={self.tag}")
+        self.log.info(f"ASR_IMAGE={self.asr_image}")
+        self.log.info(f"INGESTION_TYPE={self.ingestion_type}")
+        self.log.info(f"PIP_INDEX_URL={self.pip_index_url}")
+        self.log.info(f"DEB_MIRROR_URL={self.deb_mirror_url}")
+        self.log.info(f"APT_MIRROR_URL={self.apt_mirror_url}")
+        self.log.info(f"ALSA_CARD={self.alsa_card}")
+        self.log.info(f"ALSA_PCM_CARD={self.alsa_pcm_card}")
+        self.log.info(f"http_proxy={self.http_proxy}")
+        self.log.info(f"https_proxy={self.https_proxy}")
 
     def set_variables(self):
         """
@@ -512,10 +497,7 @@ class ConversationalAI(SetAudioDevice):
         """
         command = f"sudo mkdir -p {directory}"
         status = self.run_command(command, get_output=True)
-        if status.returncode:
-            return False
-        else:
-            return True
+        return not status.returncode
 
     def change_directory_permission(self, directory):
         """
@@ -523,10 +505,7 @@ class ConversationalAI(SetAudioDevice):
         """
         command = f"sudo chown 800:1102 {directory}"
         status = self.run_command(command, get_output=True)
-        if status.returncode:
-            return False
-        else:
-            return True
+        return not status.returncode
 
     def remove_directory(self, directory):
         """
@@ -534,10 +513,7 @@ class ConversationalAI(SetAudioDevice):
         """
         command = f"sudo rm -rf {directory}"
         status = self.run_command(command, get_output=True)
-        if status.returncode:
-            return False
-        else:
-            return True
+        return not status.returncode
 
     def check_dependencies(self):
         """
@@ -569,13 +545,13 @@ class ConversationalAI(SetAudioDevice):
             self.log.info("Initializing docker swarm")
             time.sleep(1)
 
-            command = f"sudo docker swarm init"
+            command = "sudo docker swarm init"
             # command = f"sudo docker swarm init"
             status = self.run_command(command, get_output=True)
             if status.returncode:
                 error = status.stderr.decode("utf-8")
                 if "This node is already part of a swarm" in error:
-                    cmd = f"sudo docker node ls -q"
+                    cmd = "sudo docker node ls -q"
                     retval = self.run_command(cmd, get_output=True)
                     output = retval.stdout.decode("utf-8").split("\n")
                     if len(output) == 2:
@@ -724,9 +700,7 @@ class ConversationalAI(SetAudioDevice):
         """
         try:
             self.log.info("Creating Docker Volume")
-            command = "sudo docker volume create --driver local --opt o=bind,uid=800,gid=1102 --opt type=none --opt device={} zmq_ipc_vol".format(
-                self.socketDir
-            )
+            command = f"sudo docker volume create --driver local --opt o=bind,uid=800,gid=1102 --opt type=none --opt device={self.socketDir} zmq_ipc_vol"
             self.run_command(command, "Failed to create docker volume")
         except Exception as err:
             ConversationalAIException(err)
@@ -739,17 +713,11 @@ class ConversationalAI(SetAudioDevice):
             self.log.info("Updating OBP Credentials in compose")
             command = "sudo sed -i 's/- D_TOKEN/#- D_TOKEN/g' compose/docker-compose-backend.yml"
             self.run_command(command, "Failed to comment out D_TOKEN variable")
-            command = "sudo sed -i 's/<add username here>/{}/g' compose/docker-compose-backend.yml".format(
-                self.obp_username
-            )
+            command = f"sudo sed -i 's/<add username here>/{self.obp_username}/g' compose/docker-compose-backend.yml"
             self.run_command(command, "Failed to update D_USERNAME variable")
-            command = "sudo sed -i 's/<add obp pass here>/{}/g' compose/docker-compose-backend.yml".format(
-                self.obp_pass
-            )
+            command = f"sudo sed -i 's/<add obp pass here>/{self.obp_pass}/g' compose/docker-compose-backend.yml"
             self.run_command(command, "Failed to update D_PASS variable")
-            command = "sudo sed -i 's/<add obp key here>/{}/g' compose/docker-compose-backend.yml".format(
-                self.obp_apikey
-            )
+            command = f"sudo sed -i 's/<add obp key here>/{self.obp_apikey}/g' compose/docker-compose-backend.yml"
             self.run_command(command, "Failed to update D_APIKEY variable")
         except Exception as err:
             ConversationalAIException(err)
@@ -757,17 +725,11 @@ class ConversationalAI(SetAudioDevice):
     def update_audio_device(self):
         try:
             self.log.info("Updating audio device name in compose")
-            command = "sudo sed -i 's/- ALSA_CARD.*/- ALSA_CARD={}/g' compose/docker-compose-frontend.yml".format(
-                self.alsa_card
-            )
+            command = f"sudo sed -i 's/- ALSA_CARD.*/- ALSA_CARD={self.alsa_card}/g' compose/docker-compose-frontend.yml"
             self.run_command(command, "Failed to update ALSA_CARD variable")
-            command = "sudo sed -i 's/- ALSA_CARD.*/- ALSA_CARD={}/g' compose/docker-compose-frontend-respeaker.yml".format(
-                self.alsa_card
-            )
+            command = f"sudo sed -i 's/- ALSA_CARD.*/- ALSA_CARD={self.alsa_card}/g' compose/docker-compose-frontend-respeaker.yml"
             self.run_command(command, "Failed to update ALSA_CARD variable")
-            command = "sudo sed -i 's/- ALSA_PCM_CARD.*/- ALSA_PCM_CARD={}/g' compose/docker-compose-frontend-respeaker.yml".format(
-                self.alsa_pcm_card
-            )
+            command = f"sudo sed -i 's/- ALSA_PCM_CARD.*/- ALSA_PCM_CARD={self.alsa_pcm_card}/g' compose/docker-compose-frontend-respeaker.yml"
             self.run_command(command, "Failed to update ALSA_PCM_CARD variable")
         except Exception as err:
             ConversationalAIException(err)
@@ -825,7 +787,7 @@ class ConversationalAI(SetAudioDevice):
                 "chatfrontend_tts_1",
             ]
             for container in CONTAINERS:
-                command = "sudo docker rm -f {}".format(container)
+                command = f"sudo docker rm -f {container}"
                 self.run_command(
                     command, "Failed to remove chatbot services", mandatory=False
                 )
@@ -846,10 +808,10 @@ class ConversationalAI(SetAudioDevice):
             self.run_command(command, "Failed to remove docker volume", mandatory=False)
             self.log.info("Removing Docker Secrets")
             for secret in DOCKER_SECRETS:
-                command = "sudo docker secret rm {}".format(secret)
+                command = f"sudo docker secret rm {secret}"
                 self.run_command(
                     command,
-                    "Failed to remove docker secret {}".format(secret),
+                    f"Failed to remove docker secret {secret}",
                     mandatory=False,
                 )
         except Exception as err:
@@ -862,15 +824,11 @@ class ConversationalAI(SetAudioDevice):
         try:
             self.log.info("Removing Docker Images")
             for image in DOCKER_IMAGES:
-                command = "sudo docker rmi -f {}".format(image)
-                self.run_command(
-                    command, "Failed to remove docker image {}".format(image)
-                )
+                command = f"sudo docker rmi -f {image}"
+                self.run_command(command, f"Failed to remove docker image {image}")
             for image in BASE_DOCKER_IMAGES:
-                command = "sudo docker rmi -f {}".format(image)
-                self.run_command(
-                    command, "Failed to remove docker image {}".format(image)
-                )
+                command = f"sudo docker rmi -f {image}"
+                self.run_command(command, f"Failed to remove docker image {image}")
             command = "sudo docker image prune -f"
             # self.log.info(command)
             self.run_command(
@@ -892,7 +850,7 @@ class ConversationalAI(SetAudioDevice):
                 command = f"sudo docker images {image}"
                 status = self.run_command(command, get_output=True)
                 if status.returncode:
-                    self.log.error("[ERROR]: Failed to verify {} image".format(image))
+                    self.log.error(f"[ERROR]: Failed to verify {image} image")
                 output = status.stdout.decode("utf-8").split("\n")
                 output = [i for i in output if i]
                 exists = False
@@ -934,9 +892,7 @@ class ConversationalAI(SetAudioDevice):
                 )
                 status = self.run_command(command, get_output=True)
                 if status.returncode:
-                    self.log.error(
-                        "[ERROR]: Failed to verify {} container".format(container)
-                    )
+                    self.log.error(f"[ERROR]: Failed to verify {container} container")
                 output = status.stdout.decode("utf-8").split("\n")
                 output = [i for i in output if i]
                 exists = False
@@ -992,16 +948,14 @@ class ConversationalAI(SetAudioDevice):
         """
         try:
             self.log.info("Verifying Chatbot Services")
-            result = False
             time.sleep(30)
             containers_not_found = self.verify_containers()
             service_not_found, service_not_started = self.verify_services()
-            if (
+            result = (
                 not containers_not_found
                 and not service_not_found
                 and not service_not_started
-            ):
-                result = True
+            )
             time.sleep(5)
             if not result:
                 containers_not_found = " ".join(containers_not_found)

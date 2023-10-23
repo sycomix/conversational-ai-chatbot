@@ -16,7 +16,7 @@ def find(line, variable):
         value = str.split(re.sub("[^-_/.A-Za-z0-9]+", " ", line.rstrip("\n")), " ")[
             value + 1
         ]
-        info = "found value of " + variable + "=" + value
+        info = f"found value of {variable}={value}"
         logging.debug(f"found value of {variable} = {value}")
         return value
     except ValueError:
@@ -50,5 +50,5 @@ def parse_config(asr_config):
         except Exception as msg:
             if f.closed == False:
                 f.close()
-            logging.error("received Exception: {}".format(msg))
+            logging.error(f"received Exception: {msg}")
     return (model_xml, model_bin, device, alphabet_cfg, sample_rate, version, lm)

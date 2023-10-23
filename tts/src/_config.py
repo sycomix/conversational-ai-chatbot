@@ -9,13 +9,11 @@ from zmq_integration_lib import get_inpad, get_outpad
 
 
 def get_inputport():
-    ip = get_inpad(INPUT_ADDR, INPUT_TOPIC, AUTHZ_SERVER_ADDR)
-    return ip
+    return get_inpad(INPUT_ADDR, INPUT_TOPIC, AUTHZ_SERVER_ADDR)
 
 
 def get_outputport():
-    op = get_outpad(OUTPUT_ADDR, OUTPUT_TOPIC)
-    return op
+    return get_outpad(OUTPUT_ADDR, OUTPUT_TOPIC)
 
 
 def display_help():
@@ -27,28 +25,30 @@ def display_help():
 def _validate_env_addr_variable(INPUT_ADDR, OUTPUT_ADDR, AUTHZ_SERVER_ADDR):
     for variable in [INPUT_ADDR, OUTPUT_ADDR, AUTHZ_SERVER_ADDR]:
         if (
-            not (type(variable) == str)
-            or not (len(variable.split()) == 1)
-            or not (("tcp" in variable.split(":")) or ("ipc" in variable.split(":")))
+            type(variable) != str
+            or len(variable.split()) != 1
+            or "tcp" not in variable.split(":")
+            and "ipc" not in variable.split(":")
         ):
-            raise ValueError("Please check {} address".format(variable))
+            raise ValueError(f"Please check {variable} address")
 
 
 def _validate_env_topic_variable(INPUT_TOPIC, OUTPUT_TOPIC):
     for variable in [INPUT_TOPIC, OUTPUT_TOPIC]:
-        if not (type(variable) == str) or not (len(variable.split()) == 1):
-            raise ValueError("Please check {} topic".format(variable))
+        if type(variable) != str or len(variable.split()) != 1:
+            raise ValueError(f"Please check {variable} topic")
 
 
 def _validate_env_log_level_variable(LOG_LEVEL):
-    if not LOG_LEVEL.lower() in ["info", "error", "debug"] or not (
-        len(LOG_LEVEL.split()) == 1
+    if (
+        LOG_LEVEL.lower() not in ["info", "error", "debug"]
+        or len(LOG_LEVEL.split()) != 1
     ):
         raise ValueError("Please provide correct Log level")
 
 
 def _validate_env_play_audio_variable(PLAY_AUDIO):
-    if not type(PLAY_AUDIO) == bool:
+    if type(PLAY_AUDIO) != bool:
         raise ValueError("Please check PLAY_AUDIO value ")
 
 
@@ -75,10 +75,7 @@ def _read_env_variables():
     OUTPUT_TOPIC = env("OUTPUT_TOPIC")
     AUTHZ_SERVER_ADDR = env("AUTHZ_SERVER_ADDR")
     PLAY_AUDIO = env("PLAY_AUDIO")
-    if PLAY_AUDIO == "None":
-        PLAY_AUDIO = False
-    else:
-        PLAY_AUDIO = True
+    PLAY_AUDIO = PLAY_AUDIO != "None"
     LOG_LEVEL = env("LOG_LEVEL")
 
     # Validate env address variable

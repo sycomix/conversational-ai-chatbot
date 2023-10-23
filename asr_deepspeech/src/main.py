@@ -19,7 +19,7 @@ def pusher(manager, port):
     data = ""
     while not Final:
         data, Final = manager.get_result()
-        log.debug("Inferred Output: ' {} ' Final ' {} '".format(data, Final))
+        log.debug(f"Inferred Output: ' {data} ' Final ' {Final} '")
     port.push(bytes(pretty(data), encoding="utf-8"), "FINAL")
 
 
@@ -56,9 +56,11 @@ def main():
     try:
         log.debug("Waiting to Receive Input Data")
         for data, event in ipp.data_and_event_generator():
-            log.debug("Data with Length: {} is received along with event: {}".format(len(data), event))
+            log.debug(
+                f"Data with Length: {len(data)} is received along with event: {event}"
+            )
             if event == "pcm":
-                log.debug("Process data received with event: {}".format(event))
+                log.debug(f"Process data received with event: {event}")
                 process_pcm_data(data, manager, Outport)
                 continue
             if event == "wave_file":
@@ -83,7 +85,7 @@ def process_pcm_data(data, manager, Outport):
     wave_data = data
     manager.push_data(wave_data, finish_processing=True)
     r, r1 = manager.get_result()
-    log.debug("Inferred Output: ' {} ' Final ' {} '".format(r, r1))
+    log.debug(f"Inferred Output: ' {r} ' Final ' {r1} '")
     log.debug("Publishing text output to 0MQ")
     Outport.push(bytes(r, encoding="utf-8"), "FINAL")
 

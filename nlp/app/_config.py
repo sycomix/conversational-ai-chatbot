@@ -18,28 +18,23 @@ def _prepare_path_for_secret(secret):
 
 
 def get_cert():
-    cert = None
-    if TLS_CERT is not None and TLS_KEY is not None:
-        cert = tuple(map(_prepare_path_for_secret, (TLS_CERT, TLS_KEY)))
-    return cert
+    return (
+        tuple(map(_prepare_path_for_secret, (TLS_CERT, TLS_KEY)))
+        if TLS_CERT is not None and TLS_KEY is not None
+        else None
+    )
 
 
 def get_cacert():
-    # either return False or returns the path to a cacert
-    cacert = False
-    if TLS_CACERT:
-        cacert = _prepare_path_for_secret(TLS_CACERT)
-    return cacert
+    return _prepare_path_for_secret(TLS_CACERT) if TLS_CACERT else False
 
 
 def get_inputport():
-    ip = get_inpad(INPUT_ADDR, INPUT_TOPIC, AUTHZ_SERVER_ADDR)
-    return ip
+    return get_inpad(INPUT_ADDR, INPUT_TOPIC, AUTHZ_SERVER_ADDR)
 
 
 def get_outputport():
-    op = get_outpad(OUTPUT_ADDR, OUTPUT_TOPIC)
-    return op
+    return get_outpad(OUTPUT_ADDR, OUTPUT_TOPIC)
 
 
 def display_help():
@@ -94,28 +89,30 @@ def get_jwt():
 def _validate_env_addr_variable(INPUT_ADDR, OUTPUT_ADDR, AUTHZ_SERVER_ADDR):
     for variable in [INPUT_ADDR, OUTPUT_ADDR, AUTHZ_SERVER_ADDR]:
         if (
-            not (type(variable) == str)
-            or not (len(variable.split()) == 1)
-            or not (("tcp" in variable.split(":")) or ("ipc" in variable.split(":")))
+            type(variable) != str
+            or len(variable.split()) != 1
+            or "tcp" not in variable.split(":")
+            and "ipc" not in variable.split(":")
         ):
-            raise ValueError("Please check {} address".format(variable))
+            raise ValueError(f"Please check {variable} address")
 
 
 def _validate_env_topic_variable(INPUT_TOPIC, OUTPUT_TOPIC):
     for variable in [INPUT_TOPIC, OUTPUT_TOPIC]:
-        if not (type(variable) == str) or not (len(variable.split()) == 1):
-            raise ValueError("Please check {} topic".format(variable))
+        if type(variable) != str or len(variable.split()) != 1:
+            raise ValueError(f"Please check {variable} topic")
 
 
 def _validate_env_log_level_variable(LOG_LEVEL):
-    if not LOG_LEVEL.lower() in ["info", "error", "debug"] or not (
-        len(LOG_LEVEL.split()) == 1
+    if (
+        LOG_LEVEL.lower() not in ["info", "error", "debug"]
+        or len(LOG_LEVEL.split()) != 1
     ):
         raise ValueError("Please provide correct Log level")
 
 
 def _validate_env_jwtsecret_variable(JWT_SECRET):
-    if not len(JWT_SECRET.split()) == 1:
+    if len(JWT_SECRET.split()) != 1:
         raise ValueError("Please provide JWT_SECRET")
 
 

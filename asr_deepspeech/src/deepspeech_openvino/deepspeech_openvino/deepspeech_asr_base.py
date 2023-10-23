@@ -81,9 +81,7 @@ class DeepSpeechASR(object):
         #    self.ie.add_extension(self.cpu_extension, "CPU")
         # Read IR
         log.debug(
-            "DeepSpeechASR: Loading network files:\n\t{}\n\t{}".format(
-                self.model_xml, self.model_bin
-            )
+            f"DeepSpeechASR: Loading network files:\n\t{self.model_xml}\n\t{self.model_bin}"
         )
         self.net = self.ie.read_network(
             model=self.model_xml, weights=self.model_bin)
@@ -126,7 +124,7 @@ class Alphabet(object):
         with codecs.open(alphabet_cfg, "r", "utf-8") as fin:
             try:
                 for line in fin:
-                    if line[0:2] == "\\#":
+                    if line[:2] == "\\#":
                         line = "#\n"
                     elif line[0] == "#":
                         continue
@@ -136,7 +134,7 @@ class Alphabet(object):
             except Exception as msg:
                 if fin.closed == False:
                     fin.close()
-                log.error("Received Exception: {}".format(msg))
+                log.error(f"Received Exception: {msg}")
 
     def string_from_label(self, label):
         return self._label_to_str[label]

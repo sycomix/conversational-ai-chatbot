@@ -40,8 +40,7 @@ class DeepSpeechv7(DeepSpeechASR):
             if self.exec_net:
                 del self.exec_net
         except Exception:
-            log.debug(
-                "DeepSpeechv5: Couldn't cleaunup previous exec_net: {}".format(e))
+            log.debug(f"DeepSpeechv5: Couldn't cleaunup previous exec_net: {e}")
         self.exec_net = self.ie.load_network(
             network=self.net, device_name=self.device)
         self.state_h = np.zeros((1, 2048))
@@ -108,7 +107,7 @@ class Alphabet(object):
         with codecs.open(alphabet_cfg, "r", "utf-8") as fin:
             try:
                 for line in fin:
-                    if line[0:2] == "\\#":
+                    if line[:2] == "\\#":
                         line = "#\n"
                     elif line[0] == "#":
                         continue
@@ -118,7 +117,7 @@ class Alphabet(object):
             except Exception as msg:
                 if fin.closed == False:
                     fin.close()
-                log.error("Received Exception: {}".format(msg))
+                log.error(f"Received Exception: {msg}")
 
 
     def string_from_label(self, label):

@@ -11,7 +11,7 @@ import io
 
 
 def write_config(data, config_file):
-    if not type(config_file) == (io.StringIO or io.BytesIO):
+    if type(config_file) != (io.StringIO or io.BytesIO):
         context_mgr = open(config_file, "w")
         # since file is opened using "with", no need to close explicitly
         with context_mgr as f:
@@ -76,16 +76,8 @@ class Connector(object):
             self.TOKEN = creds["TOKEN"]
         except (KeyError, IndexError):
             url = self.BASE_URL + endpoint
-            # print ("URL: {}".format(url))
-            # payload = {'some': 'data'}
-            headers = {"Content-Type": "application/json"}
-            auth = "DirectLogin username=%s,password=%s,consumer_key=%s" % (
-                creds["username"],
-                creds["password"],
-                creds["consumer_key"],
-            )
-            headers["Authorization"] = auth
-
+            auth = f'DirectLogin username={creds["username"]},password={creds["password"]},consumer_key={creds["consumer_key"]}'
+            headers = {"Content-Type": "application/json", "Authorization": auth}
             r = rq.post(url, headers=headers, verify=False)
             if "token" in r.json():
                 try:
@@ -98,24 +90,23 @@ class Connector(object):
                 print("Could not obtain token")
 
     def get_request_headers(self):
-        h = {
+        return {
             "Content-Type": "application/json",
-            "Authorization": "DirectLogin token=%s" % self.TOKEN,
+            "Authorization": f"DirectLogin token={self.TOKEN}",
         }
-        return h
 
     def refresh_token(self):
         pass
 
     def request(self, cmd, endpoint, data=""):
-        if "get" == cmd:
+        if cmd == "get":
             url = "{0}{1}".format(self.BASE_URL, endpoint)
             h = self.get_request_headers()
             # print ("Connector: GET: on ", url)
             if self.cert is not None:
                 return rq.get(url, headers=h, cert=self.cert)
             return rq.get(url, headers=h)
-        if "post" == cmd:
+        if cmd == "post":
             if self.cert is not None:
                 return rq.post(
                     url, json=data, headers=get_request_headers(), cert=self.cert

@@ -182,8 +182,7 @@ class DeepSpeechPipeline:
         mfcc_features = self.extract_mfcc(audio, sampling_rate)
         probs = self.extract_per_frame_probs(mfcc_features)
         del mfcc_features
-        transcription = self.decode_probs(probs)
-        return transcription
+        return self.decode_probs(probs)
 
     def extract_mfcc(self, audio, sampling_rate):
         # Audio feature extraction
@@ -193,9 +192,7 @@ class DeepSpeechPipeline:
             or (audio.shape + (1,))[1] != 1
         ):
             raise ValueError(
-                "Input audio file should be {} kHz mono".format(
-                    self.p["model_sampling_rate"] / 1e3
-                )
+                f'Input audio file should be {self.p["model_sampling_rate"] / 1000.0} kHz mono'
             )
         if np.issubdtype(audio.dtype, np.integer):
             # normalize to -1 to 1, int16 to float32
@@ -209,9 +206,7 @@ class DeepSpeechPipeline:
             fmin=self.p["mel_fmin"],
             fmax=self.p["mel_fmax"],
         )
-        features = melspectrum_to_mfcc(
-            melspectrum, self.p["num_mfcc_dct_coefs"])
-        return features
+        return melspectrum_to_mfcc(melspectrum, self.p["num_mfcc_dct_coefs"])
 
     def extract_per_frame_probs(
         self, mfcc_features, state=None, return_state=False, wrap_iterator=lambda x: x
@@ -282,10 +277,7 @@ class DeepSpeechPipeline:
             ]
         probs = np.concatenate(probs)
 
-        if not return_state:
-            return probs
-        else:
-            return probs, (state_h, state_c)
+        return probs if not return_state else (probs, (state_h, state_c))
 
     def decode_probs(self, probs):
         """

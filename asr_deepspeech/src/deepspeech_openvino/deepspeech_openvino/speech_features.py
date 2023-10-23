@@ -67,7 +67,7 @@ def audio_spectrogram(samples, window_size, stride, magnitude_squared):
             if end < sample_count:
                 input_for_compute = input_for_channel[start:end]
 
-                fft_input_output[0:window_size] = input_for_compute * hann_window
+                fft_input_output[:window_size] = input_for_compute * hann_window
                 fft_input_output[window_size:] = 0
 
                 _f = np.fft.rfft(fft_input_output.astype(
@@ -111,8 +111,9 @@ def mfcc_mel_filiterbank_init(sample_rate, input_length):
         if (i < start_index) or (i > end_index):
             band_mapper[i] = -2
         else:
-            while (center_frequencies[int(channel)] < melf) and (
-                channel < filterbank_channel_count_
+            while (
+                center_frequencies[channel] < melf
+                and channel < filterbank_channel_count_
             ):
                 channel += 1
             band_mapper[i] = channel - 1
@@ -153,7 +154,7 @@ def mfcc_mel_filiterbank_compute(
             output_channels[int(channel)] += weighted
         channel += 1
         if channel < filterbank_channel_count_:
-            output_channels[int(channel)] += spec_val - weighted
+            output_channels[channel] += spec_val - weighted
 
     return output_channels
 
@@ -178,9 +179,7 @@ def dct_compute(worked_filiter, input_length, dct_coefficient_count, cosine):
     output_dct = np.zeros(dct_coefficient_count)
     worked_length = worked_filiter.shape[0]
 
-    if worked_length > input_length:
-        worked_length = input_length
-
+    worked_length = min(worked_length, input_length)
     for i in range(dct_coefficient_count):
         _sum = 0.0
         for j in range(worked_length):
@@ -215,9 +214,7 @@ def mfcc(spectrogram, sample_rate, dct_coefficient_count):
             )
             for k in range(mel_filiter.shape[0]):
                 val = mel_filiter[k]
-                if val < kFilterbankFloor:
-                    val = kFilterbankFloor
-
+                val = max(val, kFilterbankFloor)
                 mel_filiter[k] = np.log(val)
 
             mfcc_output[j, :] = dct_compute(

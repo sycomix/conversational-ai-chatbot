@@ -46,7 +46,7 @@ class CtcnumpyBeamSearchDecoder:
             probs[np.newaxis]
         )
         assert out_seq_len.shape[0] == 1
-        beam_results = [
+        return [
             dict(
                 conf=scores[0, res_idx],
                 text=self.alphabet.decode(
@@ -56,4 +56,3 @@ class CtcnumpyBeamSearchDecoder:
             )
             for res_idx in range(out_seq_len.shape[1])
         ]
-        return beam_results

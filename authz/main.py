@@ -28,8 +28,7 @@ def get_token():
     try:
         log.debug("Get Token from Store")
         session_id = list(session_store.keys())[0]
-        token = session_store[session_id].token
-        return token
+        return session_store[session_id].token
     except Exception as msg:
         log.error(msg)
     return token
@@ -41,7 +40,7 @@ def logout(token):
         session_id = list(session_store.keys())[0]
         session_store.remove_entry(session_id)
     except Exception as msg:
-        log.error("Exception raised {}".format(msg))
+        log.error(f"Exception raised {msg}")
     config.logout(token)
     log.debug("Successfully Logged out User")
     return True

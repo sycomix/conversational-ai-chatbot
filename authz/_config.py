@@ -16,27 +16,29 @@ SESSION_TIMEOUT_IN_SECS = 900
 def _validate_env_addr_variable(OUTPUT_ADDR, SESSION_ADDR, TOKEN_SERVER_ADDR):
     for variable in [OUTPUT_ADDR, SESSION_ADDR, TOKEN_SERVER_ADDR]:
         if (
-            not (type(variable) == str)
-            or not (len(variable.split()) == 1)
-            or not (("tcp" in variable.split(":")) or ("ipc" in variable.split(":")))
+            type(variable) != str
+            or len(variable.split()) != 1
+            or "tcp" not in variable.split(":")
+            and "ipc" not in variable.split(":")
         ):
-            raise ValueError("Please check {} address".format(variable))
+            raise ValueError(f"Please check {variable} address")
 
 
 def _validate_env_topic_variable(OUTPUT_TOPIC):
-    if not (type(OUTPUT_TOPIC) == str) or not (len(OUTPUT_TOPIC.split()) == 1):
-        raise ValueError("Please check {} topic".format(variable))
+    if type(OUTPUT_TOPIC) != str or len(OUTPUT_TOPIC.split()) != 1:
+        raise ValueError(f"Please check {variable} topic")
 
 
 def _validate_env_log_level_variable(LOG_LEVEL):
-    if not LOG_LEVEL.lower() in ["info", "error", "debug"] or not (
-        len(LOG_LEVEL.split()) == 1
+    if (
+        LOG_LEVEL.lower() not in ["info", "error", "debug"]
+        or len(LOG_LEVEL.split()) != 1
     ):
         raise ValueError("Please provide correct Log level")
 
 
 def _variable_env_dev_variable(DEVELOPMENT):
-    if not len(DEVELOPMENT.split()) == 1:
+    if len(DEVELOPMENT.split()) != 1:
         raise ValueError("Please provide DEVELOPMENT variable value")
 
 
@@ -47,10 +49,11 @@ def _prepare_path_for_secret(secret):
 
 
 def get_cert():
-    cert = None
-    if TLS_CERT is not None and TLS_KEY is not None:
-        cert = tuple(map(_prepare_path_for_secret, (TLS_CERT, TLS_KEY)))
-    return cert
+    return (
+        tuple(map(_prepare_path_for_secret, (TLS_CERT, TLS_KEY)))
+        if TLS_CERT is not None and TLS_KEY is not None
+        else None
+    )
 
 
 def get_token_server():
@@ -102,16 +105,11 @@ def _get_login_token_dev():
     enabled, user, passwd, apikey, token = _read_env_vars_development_only()
     if enabled and not token:
         token = obp_helper.get_login_token(user, passwd, apikey, cert=get_cert())
-    if not enabled:
-        return _get_login_token()
-    return token
+    return _get_login_token() if not enabled else token
 
 
 def get_login_token():
-    if DEVELOPMENT:
-        return _get_login_token_dev()
-    else:
-        return _get_login_token()
+    return _get_login_token_dev() if DEVELOPMENT else _get_login_token()
 
 
 def _read_env_vars_development_only():

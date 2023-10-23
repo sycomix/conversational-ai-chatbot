@@ -118,16 +118,14 @@ def main(mymodel, mywave):
         except:
             if wave_read.closed == False:
                 wave_read.close()
-    
+
     log_melspectrum = QuartzNet.audio_to_melspectrum(audio.flatten(), sampling_rate)
-    
+
     quartz_net = QuartzNet(IECore(), mymodel, log_melspectrum.shape, "CPU")
-    
+
     character_probs = quartz_net.infer(log_melspectrum)
-    
-    transcription = QuartzNet.ctc_greedy_decode(character_probs)
-   
-    return transcription
+
+    return QuartzNet.ctc_greedy_decode(character_probs)
 
 if __name__ == '__main__':
     main()

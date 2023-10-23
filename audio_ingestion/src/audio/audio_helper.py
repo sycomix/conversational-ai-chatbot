@@ -17,6 +17,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # *****************************************************************************
 """Helper module for managing audio devices"""
+
 import logging
 from threading import Event
 
@@ -25,7 +26,7 @@ import soundcard
 
 TARGET_CHANNELS = [0]
 TARGET_SAMPLE_RATE = 16000
-FRAMES_PER_BUFFER = int(TARGET_SAMPLE_RATE / 1)
+FRAMES_PER_BUFFER = TARGET_SAMPLE_RATE // 1
 INT16_INFO = np.iinfo(np.int16)
 
 _logger = logging.getLogger()
@@ -146,9 +147,7 @@ class StreamReader:
         :param np_data: Numpy array
         :return: Multiplied array
         """
-        volume = 1  # by default volume is at 100%
-        if self._volume_getter:
-            volume = self._volume_getter()
+        volume = self._volume_getter() if self._volume_getter else 1
         # scale from float [-1, 1] to int16 range
         np_data *= volume * INT16_INFO.max
         if volume != 1:

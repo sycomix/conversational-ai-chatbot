@@ -22,9 +22,7 @@ def main():
         for data, event in ipp.data_and_event_generator():
             if event == "pcm":
                 log.debug(
-                    "Data with Length: {} is received along with event: {}".format(
-                        len(data), event
-                    )
+                    f"Data with Length: {len(data)} is received along with event: {event}"
                 )
                 input_wav = io.BytesIO()
 
@@ -46,7 +44,7 @@ def main():
                 log.debug("Publishing text output to 0MQ")
                 Outport.push(bytes(transcript, encoding="utf-8"), "FINAL")
 
-                log.info("Quartznet Infered Output: ' {} '".format(transcript))
+                log.info(f"Quartznet Infered Output: ' {transcript} '")
                 sys.stdout.flush()
     except Exception as e:
         log.info(e)

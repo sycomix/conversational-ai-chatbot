@@ -30,15 +30,11 @@ class Session(object):
 
     def valid(self, session_id):
         while self.active:
-            if not self.id == session_id:
-                return False
-            return True
+            return self.id == session_id
         return False
 
     @property
     def token(self):
-        if self.active:
-            pass
         return self.jwt
 
 
@@ -71,11 +67,10 @@ class SessionCache(dict):
             s = super().__getitem__(x)
             if s.active:
                 return s
-            else:
-                super().pop(x)
-                for h in self.handlers:
-                    h(s.token)
-                raise KeyError
+            super().pop(x)
+            for h in self.handlers:
+                h(s.token)
+            raise KeyError
 
 
 def _test_main():
@@ -83,15 +78,13 @@ def _test_main():
     login_session = Session(token)
 
     session_id = login_session.id
-    log.info("Session id is {}: ".format(session_id))
+    log.info(f"Session id is {session_id}: ")
     session_store = SessionCache()
     session_store.add_session(login_session)
 
     # check for session id in store
     try:
-        log.info(
-            "Token Verified {}:".format(session_store[session_id].valid(session_id))
-        )
+        log.info(f"Token Verified {session_store[session_id].valid(session_id)}:")
         log.info(session_store[session_id].token)
     except (KeyError, IndexError):
         pass
@@ -100,7 +93,7 @@ def _test_main():
         log.info(session_store[session_id].token)
         time.sleep(1)
 
-    log.info("Token Verified {}:".format(session_store[session_id].valid(session_id)))
+    log.info(f"Token Verified {session_store[session_id].valid(session_id)}:")
     # After expiry we cannot get token, it will raise an exception and
     # the session will be automatically removed from the cache
     log.info(session_store[session_id].token)

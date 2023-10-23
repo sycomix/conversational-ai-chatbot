@@ -45,13 +45,11 @@ def data_generator(wave_path, buffers_per_second=1):
             frames_per_buffer = sample_rate // buffers_per_second
             resampler_state = None
 
-            frames = file.readframes(frames_per_buffer)
-            while frames:
+            while frames := file.readframes(frames_per_buffer):
                 frames, resampler_state = _resample_frames(
                     frames, channel_count, sample_rate, resampler_state
                 )
                 yield frames
-                frames = file.readframes(frames_per_buffer)
         except Exception as msg:
             _logger.error("Received Exception %s", msg)
             if file.closed == False:

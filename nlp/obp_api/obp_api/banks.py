@@ -23,8 +23,7 @@ class Bank(apiObject):
         response = self.request(cmd, endpoint)
         if response.ok:
             js = response.json()
-            list_of_banks = js["banks"]
-            return list_of_banks
+            return js["banks"]
 
     def get_transaction_types_at_bank(self):
         pass
